@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Root Config</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/regenerator-runtime@0.13.7/runtime.min.js"></script>
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self' https: localhost:*; script-src 'unsafe-inline' 'unsafe-eval' https: localhost:*; connect-src https: localhost:* ws://localhost:*; style-src 'unsafe-inline' https:; img-src 'self' data: https:; object-src 'none';">
+  <meta name="importmap-type" content="systemjs-importmap" />
+
+  <!-- Preload scripts -->
+  <link rel="preload" href="https://cdn.jsdelivr.net/npm/single-spa@5.9.0/lib/system/single-spa.min.js" as="script">
+  <link rel="preload" href="https://unpkg.com/react@17/umd/react.development.js" as="script">
+  <link rel="preload" href="https://unpkg.com/react-dom@17/umd/react-dom.development.js" as="script">
+
+  <!-- Import Map Overrides -->
+  <script src="https://cdn.jsdelivr.net/npm/import-map-overrides@3.1.1/dist/import-map-overrides.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/systemjs@6.10.1/dist/system.min.js"></script>
+
+  <script>
+    window.onload = function () {
+      if (window.System && window.importMapOverrides) {
+        const overrides = window.importMapOverrides.getOverrideMap();
+
+        // Base import map
+        let importMap = {
+          imports: {
+            "@dsaCompiler/problemViewApplication": "https://dsacompilerproblems.netlify.app/dsaCompiler-problemViewApplication.js",
+            "@dsaCompiler/root-config": "http://localhost:9000/dsaCompiler-root-config.js",
+            "React": "https://unpkg.com/react@17/umd/react.development.js",
+            "ReactDOM": "https://unpkg.com/react-dom@17/umd/react-dom.development.js"
+          }
+        };
+        const pathMapping = {
+          "@dsaCompiler/problemViewApplication": "problems",
+        }
+        if (overrides?.imports) {
+          importMap.imports = { ...importMap.imports, ...overrides.imports }
+        }
+
+        // Create and append the import map
+        const importMapScript = document.createElement("script");
+        importMapScript.type = "systemjs-importmap";
+        importMapScript.innerHTML = JSON.stringify(importMap);
+        document.head.appendChild(importMapScript);
+
+        // Dynamically generate the router template
+        const template = document.getElementById('single-spa-layout');
+        const router = document.createElement('single-spa-router');
+
+        // Generate routes based on pathMapping
+        for (const [appName, path] of Object.entries(pathMapping)) {
+          const route = document.createElement('route');
+          route.setAttribute('path', `/${path}`);
+
+          const application = document.createElement('application');
+          application.setAttribute('name', appName);
+
+          route.appendChild(application);
+          router.appendChild(route);
+        }
+
+        template.content.replaceChildren(router);
+
+
+        // Load all modules
+        Object.values(importMap.imports || {}).forEach(url => {
+          System.import(url).catch(err => {
+            console.error(`Failed to load module from ${url}:`, err);
+          });
+        });
+
+        // Enable import map overrides UI if enableUI is called
+        const importMapUI = document.getElementById('import-map-overrides-ui');
+        if (sessionStorage.getItem('importMapOverridesEnabled') === 'true') {
+          importMapUI.style.display = 'block';
+        } else {
+          importMapUI.style.display = 'none';
+        }
+
+        // Hook into enableUI to set sessionStorage flag
+        const originalEnableUI = importMapOverrides.enableUI;
+        importMapOverrides.enableUI = function () {
+          sessionStorage.setItem('importMapOverridesEnabled', 'true');
+          if (importMapUI) {
+            importMapUI.style.display = 'block';
+          }
+          return originalEnableUI.apply(this, arguments);
+        };
+
+        // Clear the sessionStorage flag on hard refresh
+        window.onbeforeunload = function () {
+          sessionStorage.removeItem('importMapOverridesEnabled');
+        };
+      }
+    };
+  </script>
+</head>
+
+<body>
+  <noscript>
+    You need to enable JavaScript to run this app.
+  </noscript>
+
+  <!-- Single-SPA Layout Template -->
+  <template id="single-spa-layout">
+    <!-- Routes will be dynamically inserted here -->
+  </template>
+
+  <import-map-overrides-full style="display: none;" id="import-map-overrides-ui"></import-map-overrides-full>
+</body>
+
+</html>
