@@ -8,7 +8,7 @@ const commonConfig = {
   output: {
     filename: 'dsaCompiler-root-config.js', // Use contenthash for production
     path: path.resolve(__dirname, 'dist'),
-    publicPath: '/',
+    publicPath: '/', // Make sure the publicPath is set correctly
   },
   module: {
     rules: [
@@ -53,14 +53,15 @@ const devConfig = {
   devServer: {
     static: path.join(__dirname, 'src'),
     port: 9000,
-    historyApiFallback: true,
+    historyApiFallback: {
+      index: '/index.html', // Ensures correct routing in dev mode
+    },
     onBeforeSetupMiddleware: function (devServer) {
       devServer.app.get('/dsaCompiler-root-config.js', (req, res) => {
         const filePath = path.join(__dirname, 'dist', 'dsaCompiler-root-config.js');
         res.sendFile(filePath);
       });
     },
-    
     hot: true,
     open: true,
   },
@@ -74,9 +75,8 @@ const prodConfig = {
   output: {
     filename: 'dsaCompiler-root-config.js', // Remove contenthash for predictable filename
     path: path.resolve(__dirname, 'dist'),
-    publicPath: '/',
+    publicPath: '/', // Ensure correct routing in production
   },
-  
   module: {
     rules: [
       {
