@@ -43,6 +43,12 @@ const commonConfig = {
         isLocal: process.env.NODE_ENV === 'development',
         orgName: 'dsaCompiler',
       },
+      meta: {
+        'Content-Security-Policy': {
+          'http-equiv': 'Content-Security-Policy',
+          content: "script-src 'self' 'unsafe-inline' 'unsafe-eval' http://localhost:* http:;",
+        },
+      },
     }),
   ],
 };
@@ -94,8 +100,12 @@ const prodConfig = {
   },
   // Optimization settings for production
   optimization: {
-    minimize: true,
+    minimize: true, // Minify JS in production
+    splitChunks: {
+      chunks: 'all', // Optimize and split vendor bundles
+    },
   },
+  devtool: 'source-map', // High-quality source maps for production
 };
 
 module.exports = (env) => {
