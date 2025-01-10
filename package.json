@@ -6,7 +6,7 @@
     "format": "prettier --write .",
     "check-format": "prettier --check .",
     "prepare": "husky install",
-    "start": "node server.js",
+    "start": "webpack serve --mode development --env development",
     "build": "webpack --mode production --env production"
   },
   "devDependencies": {
@@ -43,7 +43,7 @@
     "cors": "^2.8.5",
     "express": "^4.21.2",
     "import-map-overrides": "^3.1.1",
-    "single-spa": "^5.9.3",
+"single-spa": "^5.9.3",
     "single-spa-layout": "^1.6.0"
   }
 }
