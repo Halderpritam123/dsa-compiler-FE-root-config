@@ -39,12 +39,20 @@ const commonConfig = {
     new HtmlWebpackPlugin({
       inject: false,
       template: 'src/index.ejs',
-      templateParameters: {
-        isLocal: true, // Set isLocal to `true` for development or `false` for production manually
-        orgName: 'dsaCompiler',
-        csp: "default-src 'self' https: localhost:*; script-src 'unsafe-inline' 'unsafe-eval' https: localhost:*;" // Development CSP settings
-        // For production, change the CSP manually as:
-        // csp: "default-src 'self' https:; script-src 'self' https:; connect-src https:; style-src 'self' https:; img-src 'self' https: data:; object-src 'none';"
+      templateParameters: (compilation, assets, options) => {
+        const isLocal = process.env.NODE_ENV === 'development';
+
+        const devCSP = "default-src 'self' https: localhost:*; script-src 'unsafe-inline' 'unsafe-eval' https: localhost:*; style-src 'unsafe-inline' https: localhost:*;";
+        const prodCSP = "default-src 'self' https:; script-src 'self' https:; style-src 'self' https:; object-src 'none';";
+
+        // Dynamically set the CSP based on the environment
+        const csp = isLocal ? devCSP : prodCSP;
+
+        return {
+          isLocal,
+          orgName: 'dsaCompiler',
+          csp, // Add the CSP string to the template parameters
+        };
       },
     }),
   ],
@@ -67,20 +75,18 @@ const devConfig = {
     },
     hot: true,
     open: true,
-    headers: {
-      'Content-Security-Policy': "script-src 'self' 'unsafe-inline' 'unsafe-eval' https: http://localhost:*;",
-    },
   },
-  devtool: 'eval-source-map', // Source maps for easier debugging
+  // Source maps for easier debugging
+  devtool: 'eval-source-map',
 };
 
 // Production configuration
 const prodConfig = {
   mode: 'production',
   output: {
-    filename: '[name].[contenthash].js', // Cache-busting filenames in production
+    filename: 'dsaCompiler-root-config.js', // Remove contenthash for predictable filename
     path: path.resolve(__dirname, 'dist'),
-    publicPath: '/',
+    publicPath: '/', // Ensure correct routing in production
   },
   module: {
     rules: [
@@ -97,8 +103,9 @@ const prodConfig = {
       },
     ],
   },
+  // Optimization settings for production
   optimization: {
-    minimize: true, // Minify the code in production
+    minimize: true,
   },
 };
 
