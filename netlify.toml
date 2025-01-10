@@ -1,18 +1,14 @@
 [build]
-  command = "npm run build"
-  publish = "dist"
-
-[[headers]]
-for = "/*"
-[headers.values]
-  Content-Security-Policy = "default-src 'self' https: localhost:*; script-src 'unsafe-inline' 'unsafe-eval' https: localhost:*; connect-src https: localhost:* ws://localhost:*; style-src 'unsafe-inline' https:; img-src 'self' data: https:; object-src 'none';"
+  command = "npm run build"   # The build command for your Single-SPA app
+  publish = "dist"            # Directory where the built files are located
 
 [[redirects]]
-from = "/*"
-to = "/index.html"
-status = 200
+  from = "/*"                 # Catch-all route for Single-SPA SPA routing
+  to = "/index.html"          # Serve index.html for all SPA routes
+  status = 200
 
 [[redirects]]
-from = "/problems"
-to = "/.netlify/functions/problems"
-status = 200
+  from = "/problems"          # Redirect /problems to the Netlify Function
+  to = "/.netlify/functions/problems"  # Netlify Function route for /problems
+  status = 200
+
