@@ -35,9 +35,11 @@
             "ReactDOM": "https://unpkg.com/react-dom@17/umd/react-dom.development.js"
           }
         };
+
         const pathMapping = {
           "@dsaCompiler/problemViewApplication": "problems",
         };
+
         if (overrides?.imports) {
           importMap.imports = { ...importMap.imports, ...overrides.imports };
         }
@@ -73,7 +75,7 @@
           });
         });
 
-        // Enable import map overrides UI if enableUI is called
+        // Check sessionStorage flag to show import map overrides UI
         const importMapUI = document.getElementById('import-map-overrides-ui');
         if (sessionStorage.getItem('importMapOverridesEnabled') === 'true') {
           importMapUI.style.display = 'block';
@@ -81,9 +83,18 @@
           importMapUI.style.display = 'none';
         }
 
+        // Enable import map overrides UI if needed
+        const enableUI = () => {
+          if (window.importMapOverrides && window.importMapOverrides.enableUI) {
+            window.importMapOverrides.enableUI();
+          }
+        };
+
+        enableUI();
+
         // Hook into enableUI to set sessionStorage flag
-        const originalEnableUI = importMapOverrides.enableUI;
-        importMapOverrides.enableUI = function () {
+        const originalEnableUI = window.importMapOverrides.enableUI;
+        window.importMapOverrides.enableUI = function () {
           sessionStorage.setItem('importMapOverridesEnabled', 'true');
           if (importMapUI) {
             importMapUI.style.display = 'block';
