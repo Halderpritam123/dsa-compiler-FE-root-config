@@ -6,9 +6,9 @@ const { merge } = require('webpack-merge');
 const commonConfig = {
   entry: './src/dsaCompiler-root-config.js',
   output: {
-    filename: 'dsaCompiler-root-config.js', // Use contenthash for production
+    filename: 'dsaCompiler-root-config.js',
     path: path.resolve(__dirname, 'dist'),
-    publicPath: '/', // Make sure the publicPath is set correctly
+    publicPath: '/', // Ensure proper publicPath for production
   },
   module: {
     rules: [
@@ -18,7 +18,7 @@ const commonConfig = {
           {
             loader: 'html-loader',
             options: {
-              minimize: false, // Minification handled by mode
+              minimize: false, // Handled separately for production
             },
           },
         ],
@@ -40,8 +40,14 @@ const commonConfig = {
       inject: false,
       template: 'src/index.ejs',
       templateParameters: {
-        isLocal: process.env.NODE_ENV === 'development',
+        isLocal: 'development',
         orgName: 'dsaCompiler',
+      },
+      meta: {
+        'Content-Security-Policy': {
+          'http-equiv': 'Content-Security-Policy',
+          content: "script-src 'self' 'unsafe-inline' 'unsafe-eval' http://localhost:* https:;",
+        },
       },
     }),
   ],
@@ -53,10 +59,8 @@ const devConfig = {
   devServer: {
     static: path.join(__dirname, 'src'),
     port: 9000,
-    historyApiFallback: {
-      index: '/index.html', // Ensures correct routing in dev mode
-    },
-    onBeforeSetupMiddleware: function (devServer) {
+    historyApiFallback: true, // Ensure correct routing for SPA in dev mode
+    onBeforeSetupMiddleware: (devServer) => {
       devServer.app.get('/dsaCompiler-root-config.js', (req, res) => {
         const filePath = path.join(__dirname, 'dist', 'dsaCompiler-root-config.js');
         res.sendFile(filePath);
@@ -65,17 +69,16 @@ const devConfig = {
     hot: true,
     open: true,
   },
-  // Source maps for easier debugging
-  devtool: 'eval-source-map',
+  devtool: 'eval-source-map', // Source maps for easier debugging
 };
 
 // Production configuration
 const prodConfig = {
   mode: 'production',
   output: {
-    filename: 'dsaCompiler-root-config.js', // Remove contenthash for predictable filename
+    filename: 'dsaCompiler-root-config.[contenthash].js', // Use content hash for caching
     path: path.resolve(__dirname, 'dist'),
-    publicPath: '/', // Ensure correct routing in production
+    publicPath: '/', // Ensure proper routing for production
   },
   module: {
     rules: [
@@ -85,17 +88,20 @@ const prodConfig = {
           {
             loader: 'html-loader',
             options: {
-              minimize: true, // Enable minification for production
+              minimize: true, // Minify HTML in production
             },
           },
         ],
       },
     ],
   },
-  // Optimization settings for production
   optimization: {
-    minimize: true,
+    minimize: true, // Minify JS in production
+    splitChunks: {
+      chunks: 'all', // Optimize and split vendor bundles
+    },
   },
+  devtool: 'source-map', // High-quality source maps for production
 };
 
 module.exports = (env) => {
