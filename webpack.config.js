@@ -39,20 +39,9 @@ const commonConfig = {
     new HtmlWebpackPlugin({
       inject: false,
       template: 'src/index.ejs',
-      templateParameters: (compilation, assets, options) => {
-        const isLocal = process.env.NODE_ENV === 'development';
-
-        const devCSP = "default-src 'self' https: localhost:*; script-src 'unsafe-inline' 'unsafe-eval' https: localhost:*; style-src 'unsafe-inline' https: localhost:*;";
-        const prodCSP = "default-src 'self' https:; script-src 'self' https:; style-src 'self' https:; object-src 'none';";
-
-        // Dynamically set the CSP based on the environment
-        const csp = isLocal ? devCSP : prodCSP;
-
-        return {
-          isLocal,
-          orgName: 'dsaCompiler',
-          csp, // Add the CSP string to the template parameters
-        };
+      templateParameters: {
+        isLocal: process.env.NODE_ENV === 'development',
+        orgName: 'dsaCompiler',
       },
     }),
   ],
