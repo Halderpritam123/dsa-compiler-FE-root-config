@@ -1,14 +1,16 @@
 [build]
-  command = "npm run build"   # The build command for your Single-SPA app
-  publish = "dist"            # Directory where the built files are located
+  command = "npm run build"    # The build command for your Single-SPA app
+  publish = "dist"             # Directory where the built files are located
+
+[functions]
+  directory = "netlify/functions"  # Directory for Netlify Functions
 
 [[redirects]]
-  from = "/*"                 # Catch-all route for Single-SPA SPA routing
-  to = "/index.html"          # Serve index.html for all SPA routes
+  from = "/*"                  # Catch-all route for Single-SPA SPA routing
+  to = "/index.html"           # Serve index.html for all SPA routes
   status = 200
 
 [[redirects]]
-  from = "/problems"          # Redirect /problems to the Netlify Function
+  from = "/problems"           # Redirect /problems to the Netlify Function
   to = "/.netlify/functions/problems"  # Netlify Function route for /problems
   status = 200
-
