@@ -8,8 +8,10 @@
   <title>Root Config</title>
 
   <script src="https://cdn.jsdelivr.net/npm/regenerator-runtime@0.13.7/runtime.min.js"></script>
-  <meta http-equiv="Content-Security-Policy"
-    content="default-src 'self' https: localhost:*; script-src 'unsafe-inline' 'unsafe-eval' https: localhost:*; connect-src https: localhost:* ws://localhost:*; style-src 'unsafe-inline' https:; img-src 'self' data: https:; object-src 'none';">
+  
+  <!-- Dynamically set Content-Security-Policy (CSP) -->
+  <meta http-equiv="Content-Security-Policy" content="<%= csp %>">
+  
   <meta name="importmap-type" content="systemjs-importmap" />
 
   <!-- Preload scripts -->
@@ -37,9 +39,9 @@
         };
         const pathMapping = {
           "@dsaCompiler/problemViewApplication": "problems",
-        }
+        };
         if (overrides?.imports) {
-          importMap.imports = { ...importMap.imports, ...overrides.imports }
+          importMap.imports = { ...importMap.imports, ...overrides.imports };
         }
 
         // Create and append the import map
@@ -65,7 +67,6 @@
         }
 
         template.content.replaceChildren(router);
-
 
         // Load all modules
         Object.values(importMap.imports || {}).forEach(url => {

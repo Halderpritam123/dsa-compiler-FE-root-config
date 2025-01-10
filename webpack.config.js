@@ -40,8 +40,11 @@ const commonConfig = {
       inject: false,
       template: 'src/index.ejs',
       templateParameters: {
-        isLocal: process.env.NODE_ENV === 'development',
+        isLocal: true, // Set isLocal to `true` for development or `false` for production manually
         orgName: 'dsaCompiler',
+        csp: "default-src 'self' https: localhost:*; script-src 'unsafe-inline' 'unsafe-eval' https: localhost:*;" // Development CSP settings
+        // For production, change the CSP manually as:
+        // csp: "default-src 'self' https:; script-src 'self' https:; connect-src https:; style-src 'self' https:; img-src 'self' https: data:; object-src 'none';"
       },
     }),
   ],
@@ -64,18 +67,20 @@ const devConfig = {
     },
     hot: true,
     open: true,
+    headers: {
+      'Content-Security-Policy': "script-src 'self' 'unsafe-inline' 'unsafe-eval' https: http://localhost:*;",
+    },
   },
-  // Source maps for easier debugging
-  devtool: 'eval-source-map',
+  devtool: 'eval-source-map', // Source maps for easier debugging
 };
 
 // Production configuration
 const prodConfig = {
   mode: 'production',
   output: {
-    filename: 'dsaCompiler-root-config.js', // Remove contenthash for predictable filename
+    filename: '[name].[contenthash].js', // Cache-busting filenames in production
     path: path.resolve(__dirname, 'dist'),
-    publicPath: '/', // Ensure correct routing in production
+    publicPath: '/',
   },
   module: {
     rules: [
@@ -92,9 +97,8 @@ const prodConfig = {
       },
     ],
   },
-  // Optimization settings for production
   optimization: {
-    minimize: true,
+    minimize: true, // Minify the code in production
   },
 };
 
