@@ -30,7 +30,8 @@
         let importMap = {
           imports: {
             "@dsaCompiler/problemViewApplication": "https://dsacompilerproblems.netlify.app/dsaCompiler-problemViewApplication.js",
-            "@dsaCompiler/root-config": "https://dsa-compiler-fe-root-con.onrender.com/dsaCompiler-root-config.js",
+            "@dsaCompiler/editor": "https://dsaeditor.netlify.app/dsaCompiler-editor.js",
+            "@dsaCompiler/root-config": "http://localhost:9000/dsaCompiler-root-config.js",
             "React": "https://unpkg.com/react@17/umd/react.development.js",
             "ReactDOM": "https://unpkg.com/react-dom@17/umd/react-dom.development.js"
           }
@@ -38,6 +39,7 @@
 
         const pathMapping = {
           "@dsaCompiler/problemViewApplication": "/",
+          "@dsaCompiler/editor": "/:id"
         };
 
         if (overrides?.imports) {
@@ -57,7 +59,7 @@
         // Generate routes based on pathMapping
         for (const [appName, path] of Object.entries(pathMapping)) {
           const route = document.createElement('route');
-          route.setAttribute('path', `/${path}`);
+          route.setAttribute('path', path); // Use the exact path provided in pathMapping
 
           const application = document.createElement('application');
           application.setAttribute('name', appName);
@@ -78,7 +80,7 @@
         // Check sessionStorage flag to show import map overrides UI
         const importMapUI = document.getElementById('import-map-overrides-ui');
         if (sessionStorage.getItem('importMapOverridesEnabled') === 'true') {
-          importMapUI.style.display = 'block';
+        importMapUI.style.display = 'block';
         } else {
           importMapUI.style.display = 'none';
         }

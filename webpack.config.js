@@ -68,8 +68,7 @@ const devConfig = {
         res.sendFile(filePath);
       });
     },
-    hot: true,
-    open: true,
+    hot: true
   },
   // Source maps for easier debugging
   devtool: 'eval-source-map',
