@@ -1,5 +1,4 @@
 # dsa-compiler-FE-root-config
-# DSA Compiler - Root Config
 ### Deployed URL:
 ```
 https://dsa-compiler-root-config.netlify.app/
