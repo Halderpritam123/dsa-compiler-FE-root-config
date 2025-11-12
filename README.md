@@ -1,8 +1,8 @@
 # dsa-compiler-FE-root-config
 ### Deployed URL:
-```
 https://dsa-compiler-root-config.netlify.app/
- ```
+<br>
+<br>
 This project is the root configuration for a **Single-SPA** micro-frontend architecture. It integrates various front-end applications such as problem viewer and editor, dynamically loaded based on routing configuration.
 ## Reposetory
 ### Frontend:
